@@ -66,4 +66,66 @@ ggplot(data = homes_sub, x= SqFt, y = Price) +
   geom_point(aes(x = SqFt, y = Price, color = City, shape = Status))
 ```
 
+# model the relationship
+using home price as the dependant variable
+
+```{r}
+# making a saturated model, uses every variable in dataset
+
+homes_lm1 <- lm(Price ~ City + Bedrooms + Bathrooms + SqFt + PricePerSqFt + Status, data = homes_sub)
+
+# make a subset with only swantitative variables
+
+homes_quant <- homes_sub %>% 
+  select(Price:PricePerSqFt)
+
+# finding correlation between these
+homes_cor <- cor(homes_quant)
+homes_cor
+
+corrplot(homes_cor)
+
+# looking at the plotted linear model to double check assumptions
+plot(homes_lm1)
+
+```
+# trying anohter model where we simplify it a bit:
+
+making another model with just 
+- city,
+- sqft
+- status
+```{r}
+# new model
+
+homes_lm2 <- lm(Price ~ City + SqFt + Status, data = homes_sub)
+homes_lm2
+
+plot(homes_lm2)
+```
+
+## Find the AIC value of each model
+```{r}
+AIC(homes_lm1)
+AIC(homes_lm2)
+# not satisfied with these, will make another!
+```
+
+making a new model that ahs better fit, check out the fit and AIC
+
+```{r}
+homes_lm3 <-lm(Price ~ City + SqFt + Bedrooms + Status, data = homes_sub)
+homes_lm3
+plot(homes_lm3)
+AIC(homes_lm3)
+
+homes_lm4 <- lm(Price ~ City + SqFt, data = homes_sub)
+homes_lm4
+plot(homes_lm4)
+AIC(homes_lm4)
+
+# getting a model summary - if you do this for multiple models it wants the models as a list
+
+modelsummary(list(homes_lm1, homes_lm2, homes_lm3))
+```
 
