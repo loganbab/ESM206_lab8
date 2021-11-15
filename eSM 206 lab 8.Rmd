@@ -128,4 +128,10 @@ AIC(homes_lm4)
 
 modelsummary(list(homes_lm1, homes_lm2, homes_lm3))
 ```
+```{r}
+# using broom::augment to make predictions with this model
+homes_predicted <- augment(homes_lm1)
+
+# use predict functions to try model on new scenarios
+```
 
