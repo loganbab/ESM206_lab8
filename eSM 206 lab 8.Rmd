@@ -5,26 +5,65 @@ date: "November 15, 2021"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+
+# attache packages
+library(tidyverse)
+library(corrplot)
+library(stargazer)
+library(broom)
+library(modelsummary)
+library(here)
+
+
+# read in data
+
+homes <- read_csv(here("data", "slo_homes.csv"))
+
 ```
 
-## R Markdown
+# a little bit of cleaning:
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+Make a subset called homes_sub that only contains rows where the city is:
+- slo,
+- ag
+- atascadero
+-santa maria-orcutt
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+```{r eval = FALSE}
+# use the eval = false if you dont want this code chunk to even run!
+homes_sub <- homes %>% 
+  filter(City %in% c("San Luis Obispo", "Arroyo Grande", "Atascadero", "Santa Maria-Orcutt"))
 
-```{r cars}
-summary(cars)
 ```
 
-## Including Plots
+# a bit of exploring!!
 
-You can also embed plots, for example:
+Find summary stats for home price based on city and sale status
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+- Find and return in a nice summary table the mean and standard deviation of home price, grouped by city and sale status
+
+```{r}
+
+# make a summary table
+
+summary_table <- homes_sub %>% 
+  group_by(City, Status) %>% 
+  summarize(mean_price = mean(Price),
+            sd_price = sd(Price))
+
+# exploratory graph
+ggplot(data = homes_sub, aes(x = Price)) +
+  geom_density(aes(color = City, fill = City), alpha = 0.3) +# color and fill are in aes because they are referring to a variable! if its referring to a constant, should be outside aes
+  scale_x_continuous(limits = c(0, 3e6))
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+Explore the relationship between square footage and home price
+
+```{r}
+ggplot(data = homes_sub, x= SqFt, y = Price) +
+  geom_point(aes(x = SqFt, y = Price, color = City, shape = Status))
+```
+
+
